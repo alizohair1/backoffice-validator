@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+html {
+  background-color: #fbfaf8;
+}
+
+body {
+  color: #16213e;
+  font-family: var(--font-body);
+}
+
+::selection {
+  background: #16213e;
+  color: #fbfaf8;
+}
+
+/* Tabular figures for every quantity / numeric cell */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The "ink stamp" status badge signature element */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1.5px solid currentColor;
+  transform: rotate(-1.2deg);
+  white-space: nowrap;
+}
+
+.stamp::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* Focus visibility for keyboard nav */
+:focus-visible {
+  outline: 2px solid #16213e;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Custom scrollbar for the results table */
+.recon-scroll::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.recon-scroll::-webkit-scrollbar-thumb {
+  background: #dde2e6;
+  border-radius: 4px;
+}
+.recon-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
