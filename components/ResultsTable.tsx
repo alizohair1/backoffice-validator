@@ -17,6 +17,8 @@ interface Props {
   unmatchedDynamics: DynamicsItem[];
   unmatchedS4U: S4UItem[];
   onManualMatch: (dynamicsItemNumber: string, s4uSourceRow: number) => void;
+  onRemoveDynamics: (dynamicsItemNumber: string) => void;
+  onRemoveS4U: (s4uSourceRow: number) => void;
   aiSuggestions: ResolvedAiSuggestion[];
   aiLoading: boolean;
   aiError: string | null;
@@ -37,6 +39,8 @@ export default function ResultsTable({
   unmatchedDynamics,
   unmatchedS4U,
   onManualMatch,
+  onRemoveDynamics,
+  onRemoveS4U,
   aiSuggestions,
   aiLoading,
   aiError,
@@ -244,6 +248,7 @@ export default function ResultsTable({
                     item={d}
                     pool={unmatchedS4U}
                     onMatch={(sRow) => onManualMatch(d.itemNumber, sRow)}
+                    onRemove={() => onRemoveDynamics(d.itemNumber)}
                   />
                 ))}
                 {unmatchedDynamics.length === 0 && (
@@ -263,6 +268,7 @@ export default function ResultsTable({
                     item={s}
                     pool={unmatchedDynamics}
                     onMatch={(itemNumber) => onManualMatch(itemNumber, s.sourceRow)}
+                    onRemove={() => onRemoveS4U(s.sourceRow)}
                   />
                 ))}
                 {unmatchedS4U.length === 0 && (
@@ -281,20 +287,33 @@ function UnmatchedDynamicsRow({
   item,
   pool,
   onMatch,
+  onRemove,
 }: {
   item: DynamicsItem;
   pool: S4UItem[];
   onMatch: (s4uSourceRow: number) => void;
+  onRemove: () => void;
 }) {
   const candidates = useMemo(() => suggestMatchesForDynamics(item, pool), [item, pool]);
   const [selected, setSelected] = useState<string>("");
 
   return (
     <li className="border border-hairline rounded-md px-3 py-2.5 bg-paper">
-      <p className="text-sm text-ink">{item.productName}</p>
-      <p className="text-[11px] text-inkmuted font-mono mb-2">
-        {item.itemNumber} · qty {fmtQty(item.transferQty)}
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm text-ink">{item.productName}</p>
+          <p className="text-[11px] text-inkmuted font-mono mb-2">
+            {item.itemNumber} · qty {fmtQty(item.transferQty)}
+          </p>
+        </div>
+        <button
+          onClick={onRemove}
+          title="Remove from this list — won't be matched or exported"
+          className="text-[11px] text-inkmuted hover:text-mismatch shrink-0"
+        >
+          Remove
+        </button>
+      </div>
       <div className="flex gap-2">
         <select
           value={selected}
@@ -326,20 +345,33 @@ function UnmatchedS4URow({
   item,
   pool,
   onMatch,
+  onRemove,
 }: {
   item: S4UItem;
   pool: DynamicsItem[];
   onMatch: (itemNumber: string) => void;
+  onRemove: () => void;
 }) {
   const candidates = useMemo(() => suggestMatchesForS4U(item, pool), [item, pool]);
   const [selected, setSelected] = useState<string>("");
 
   return (
     <li className="border border-hairline rounded-md px-3 py-2.5 bg-paper">
-      <p className="text-sm text-ink">{item.description}</p>
-      <p className="text-[11px] text-inkmuted font-mono mb-2">
-        {item.vendor ? `${item.vendor} · ` : ""}N. Qty {fmtQty(item.netQty)}
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm text-ink">{item.description}</p>
+          <p className="text-[11px] text-inkmuted font-mono mb-2">
+            {item.vendor ? `${item.vendor} · ` : ""}N. Qty {fmtQty(item.netQty)}
+          </p>
+        </div>
+        <button
+          onClick={onRemove}
+          title="Remove from this list — won't be matched or exported"
+          className="text-[11px] text-inkmuted hover:text-mismatch shrink-0"
+        >
+          Remove
+        </button>
+      </div>
       <div className="flex gap-2">
         <select
           value={selected}
