@@ -7,38 +7,40 @@ interface Props {
   title: string;
   system: string;
   hint: string;
-  fileName: string | null;
+  fileLabel: string | null; // e.g. "DynamicsExport.xlsx" (1 file) or "3 files" (multiple)
+  fileNames: string[]; // full list, shown underneath the label when there's more than one
   itemCount: number | null;
   detectedHeaders: string[];
   issues: ParseIssue[];
   loading: boolean;
-  onFile: (file: File) => void;
+  onFiles: (files: File[]) => void;
 }
 
 export default function UploadZone({
   title,
   system,
   hint,
-  fileName,
+  fileLabel,
+  fileNames,
   itemCount,
   detectedHeaders,
   issues,
   loading,
-  onFile,
+  onFiles,
 }: Props) {
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const errors = issues.filter((i) => i.level === "error");
   const warnings = issues.filter((i) => i.level === "warning");
-  const ok = fileName && errors.length === 0 && !loading;
+  const ok = fileLabel && errors.length === 0 && !loading;
 
   const handleFiles = useCallback(
     (files: FileList | null) => {
       if (!files || files.length === 0) return;
-      onFile(files[0]);
+      onFiles(Array.from(files));
     },
-    [onFile]
+    [onFiles]
   );
 
   return (
@@ -72,26 +74,31 @@ export default function UploadZone({
           ref={inputRef}
           type="file"
           accept=".xlsx,.xls,.csv"
+          multiple
           className="sr-only"
           onChange={(e) => handleFiles(e.target.files)}
         />
-        {!fileName && !loading && (
+        {!fileLabel && !loading && (
           <>
-            <p className="text-sm text-ink font-medium">Drop file or click to browse</p>
+            <p className="text-sm text-ink font-medium">Drop file(s) or click to browse</p>
             <p className="text-xs text-inkmuted mt-1">{hint}</p>
+            <p className="text-[11px] text-inkmuted mt-1">You can select more than one file at once</p>
           </>
         )}
-        {loading && <p className="text-sm text-inkmuted">Reading {fileName}…</p>}
-        {fileName && !loading && (
+        {loading && <p className="text-sm text-inkmuted">Reading {fileLabel}…</p>}
+        {fileLabel && !loading && (
           <>
-            <p className="text-sm font-medium text-ink truncate">{fileName}</p>
+            <p className="text-sm font-medium text-ink truncate">{fileLabel}</p>
+            {fileNames.length > 1 && (
+              <p className="text-[11px] text-inkmuted mt-1 truncate">{fileNames.join(" · ")}</p>
+            )}
             {ok && itemCount !== null && (
               <p className="text-xs text-match mt-1 font-mono">{itemCount} item rows detected</p>
             )}
             {errors.length > 0 && (
               <p className="text-xs text-mismatch mt-1">Couldn&rsquo;t read this as expected — see below</p>
             )}
-            <p className="text-[11px] text-inkmuted mt-2 underline">Choose a different file</p>
+            <p className="text-[11px] text-inkmuted mt-2 underline">Choose different file(s)</p>
           </>
         )}
       </label>
